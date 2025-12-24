@@ -1,34 +1,30 @@
 import os
 import json
 import gspread
-from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2.service_account import Credentials
 
-def setup_google_sheets():
+def save_to_google_sheet(data):
     try:
-        creds_json = os.getenv("GSHEET_CREDENTIALS")
-        sheet_id = os.getenv("GSHEET_ID")
+        creds_json = os.environ.get("GSHEET_CREDENTIALS")
+        sheet_id = os.environ.get("GSHEET_ID")
 
         if not creds_json or not sheet_id:
-            print("❌ Missing Google Sheets ENV variables")
-            return None
+            print("❌ Google Sheets ENV missing")
+            return
 
         creds_dict = json.loads(creds_json)
 
-        scope = [
-            "https://spreadsheets.google.com/feeds",
-            "https://www.googleapis.com/auth/drive"
-        ]
-
-        creds = ServiceAccountCredentials.from_json_keyfile_dict(
-            creds_dict, scope
-        )
+        scopes = ["https://www.googleapis.com/auth/spreadsheets"]
+        creds = Credentials.from_service_account_info(creds_dict, scopes=scopes)
 
         client = gspread.authorize(creds)
         sheet = client.open_by_key(sheet_id).sheet1
-        return sheet
+
+        sheet.append_row(data)
+        print("✅ Lead saved to Google Sheet")
 
     except Exception as e:
-        print(f"Google Sheets error: {e}")
-        return None
+        print("❌ Google Sheets error:", e)
+
 
 
