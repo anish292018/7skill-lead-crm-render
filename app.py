@@ -43,13 +43,7 @@ def setup_google_sheets():
         'https://spreadsheets.google.com/feeds',
         'https://www.googleapis.com/auth/drive'
     ]
-    creds = ServiceAccountCredentials.from_json_keyfile_name(
-        'credentials.json', scope
-    )
-    client = gspread.authorize(creds)
-    sheet = client.open('7Skill_Leads_CRM').sheet1
-    return sheet
-
+    
 # -------------------------------
 # Routes
 # -------------------------------
